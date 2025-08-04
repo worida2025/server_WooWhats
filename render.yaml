@@ -1,0 +1,27 @@
+{
+  "name": "WooWhats Server",
+  "description": "WhatsApp Web integration server for WooCommerce notifications",
+  "type": "web",
+  "env": "node",
+  "buildCommand": "npm install",
+  "startCommand": "npm start",
+  "healthCheckPath": "/health",
+  "envVars": [
+    {
+      "key": "NODE_ENV",
+      "value": "production"
+    },
+    {
+      "key": "MAX_RECONNECT_ATTEMPTS", 
+      "value": "5"
+    },
+    {
+      "key": "WHATSAPP_SESSION_PATH",
+      "value": "/tmp/wwebjs_auth"
+    },
+    {
+      "key": "ALLOWED_ORIGINS",
+      "value": "*"
+    }
+  ]
+}
