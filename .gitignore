@@ -101,6 +101,12 @@ dist
 .wwebjs_auth/
 .wwebjs_cache/
 
+# SaaS Platform data
+data/
+*.db
+*.sqlite
+*.sqlite3
+
 # Custom settings
 settings.json
 
@@ -112,3 +118,6 @@ settings.json
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Old server backup
+server-old.js
