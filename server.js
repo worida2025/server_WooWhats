@@ -4,6 +4,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const fs = require('fs-extra');
 const path = require('path');
+const session = require('express-session');
 require('dotenv').config();
 
 const app = express();
@@ -51,6 +52,23 @@ app.use(cors({
 
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ extended: true, limit: '10mb' }));
+
+// Session management for dashboard authentication
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'woowhats-demo-secret-change-in-production',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { 
+    secure: NODE_ENV === 'production',
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
+}));
+
+// Serve static files for the dashboard
+app.use('/css', express.static(path.join(__dirname, 'public/css')));
+app.use('/js', express.static(path.join(__dirname, 'public/js')));
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Trust proxy for Render
 app.set('trust proxy', 1);
@@ -304,6 +322,14 @@ initializeWhatsAppClient();
 
 // Health check endpoint
 app.get('/', (req, res) => {
+  // Check if this is a browser request (has HTML accept header)
+  const acceptHeader = req.get('Accept') || '';
+  if (acceptHeader.includes('text/html')) {
+    // Browser request - redirect to dashboard
+    return res.redirect('/dashboard');
+  }
+  
+  // API request - return JSON status
   res.json({ 
     status: 'ok',
     service: 'WooWhats WhatsApp Server',
@@ -557,6 +583,82 @@ app.post('/refresh-session', async (req, res) => {
     handleReconnect('refresh_requested_not_connected');
     res.json({ success: true, reconnecting: true });
   }
+});
+
+// Dashboard Authentication Middleware
+function requireAuth(req, res, next) {
+  if (req.session && req.session.authenticated) {
+    return next();
+  } else {
+    return res.redirect('/dashboard');
+  }
+}
+
+// Dashboard Routes
+// Redirect root to dashboard
+app.get('/dashboard', (req, res) => {
+  if (req.session && req.session.authenticated) {
+    res.sendFile(path.join(__dirname, 'public/dashboard.html'));
+  } else {
+    res.sendFile(path.join(__dirname, 'public/login.html'));
+  }
+});
+
+// Login page
+app.get('/dashboard/login', (req, res) => {
+  if (req.session && req.session.authenticated) {
+    res.redirect('/dashboard');
+  } else {
+    res.sendFile(path.join(__dirname, 'public/login.html'));
+  }
+});
+
+// Handle login POST
+app.post('/dashboard/login', (req, res) => {
+  const { username, password } = req.body;
+  
+  // Demo credentials - in production, use proper authentication
+  if (username === 'admin' && password === 'demo123') {
+    req.session.authenticated = true;
+    req.session.username = username;
+    res.redirect('/dashboard');
+  } else {
+    res.status(401).send(`
+      <html>
+        <head>
+          <title>Login Failed</title>
+          <link rel="stylesheet" href="/css/style.css">
+        </head>
+        <body>
+          <div class="login-container">
+            <div class="login-box">
+              <h1>❌ Login Failed</h1>
+              <p style="color: #dc3545; margin-bottom: 20px;">Invalid username or password.</p>
+              <p>Please use the demo credentials:</p>
+              <p><strong>Username:</strong> admin</p>
+              <p><strong>Password:</strong> demo123</p>
+              <a href="/dashboard" class="btn" style="display: inline-block; text-decoration: none; margin-top: 15px;">Try Again</a>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+  }
+});
+
+// Logout
+app.get('/dashboard/logout', (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error('Session destroy error:', err);
+    }
+    res.redirect('/dashboard');
+  });
+});
+
+// Protected dashboard routes
+app.get('/dashboard/main', requireAuth, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/dashboard.html'));
 });
 
 // Function to send a message using the WhatsApp Web client
