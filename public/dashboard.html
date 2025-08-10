@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WooWhats Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="dashboard-page">
+    <div class="container">
+        <!-- Dashboard Header -->
+        <div class="dashboard-header">
+            <h1>📱 WooWhats Dashboard</h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div class="status-badge status-disconnected" id="statusBadge">
+                    <span id="statusText">Disconnected</span>
+                </div>
+                <a href="/dashboard/logout" class="logout-btn">Logout</a>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- WhatsApp Connection Status -->
+            <div class="card">
+                <h2>
+                    <span class="card-icon">🔗</span>
+                    Connection Status
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Status:</label>
+                        <span id="connectionStatus">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Ready:</label>
+                        <span id="isReady">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Phone:</label>
+                        <span id="phoneNumber">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Session:</label>
+                        <span id="hasSession">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Reconnect Attempts:</label>
+                        <span id="reconnectAttempts">Loading...</span>
+                    </div>
+                </div>
+                <div class="actions-container" style="margin-top: 20px;">
+                    <button class="btn btn-small" id="refreshBtn">🔄 Refresh Status</button>
+                    <button class="btn btn-small btn-secondary" data-action="refresh-session">🔁 Refresh Session</button>
+                    <button class="btn btn-small btn-danger" data-action="disconnect">❌ Disconnect</button>
+                </div>
+            </div>
+
+            <!-- QR Code Display -->
+            <div class="card">
+                <h2>
+                    <span class="card-icon">📷</span>
+                    QR Code Scanner
+                </h2>
+                <div class="qr-container" id="qrCodeContainer">
+                    <div class="qr-placeholder">
+                        Loading QR code...
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 14px;">
+                    Scan the QR code with your WhatsApp mobile app to connect
+                </p>
+            </div>
+
+            <!-- Send Message -->
+            <div class="card">
+                <h2>
+                    <span class="card-icon">💬</span>
+                    Send Message
+                </h2>
+                <form id="messageForm" class="message-form">
+                    <div class="form-group">
+                        <label for="phoneInput">Phone Number (with country code):</label>
+                        <input type="tel" id="phoneInput" placeholder="e.g., 966501234567" class="form-control" required>
+                        <small style="color: #666; font-size: 12px;">Include country code (e.g., 966 for Saudi Arabia)</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="messageText">Message:</label>
+                        <textarea id="messageText" placeholder="Type your message here..." class="form-control" required></textarea>
+                    </div>
+                    <button type="submit" id="sendBtn" class="btn">📤 Send Message</button>
+                </form>
+            </div>
+
+            <!-- Server Information -->
+            <div class="card">
+                <h2>
+                    <span class="card-icon">⚙️</span>
+                    Server Information
+                </h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Uptime:</label>
+                        <span id="serverUptime">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Port:</label>
+                        <span id="serverPort">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Environment:</label>
+                        <span id="serverEnvironment">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Memory Usage:</label>
+                        <span id="memoryUsage">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <label>Last Activity:</label>
+                        <span id="lastActivity">Loading...</span>
+                    </div>
+                </div>
+                <div class="refresh-indicator" id="refreshIndicator">
+                    Initializing...
+                </div>
+            </div>
+        </div>
+
+        <!-- API Information -->
+        <div class="card">
+            <h2>
+                <span class="card-icon">📡</span>
+                API Endpoints
+            </h2>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; font-family: monospace;">
+                <p><strong>GET /status</strong> - Get WhatsApp connection status</p>
+                <p><strong>GET /qr</strong> - Get QR code for authentication</p>
+                <p><strong>POST /send</strong> - Send WhatsApp message</p>
+                <p><strong>POST /disconnect</strong> - Disconnect WhatsApp session</p>
+                <p><strong>POST /refresh-session</strong> - Refresh current session</p>
+            </div>
+            <p style="margin-top: 15px; color: #666; font-size: 14px;">
+                Use these endpoints to integrate WhatsApp functionality into your applications.
+            </p>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+</html>
